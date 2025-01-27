@@ -54,7 +54,7 @@ interface FormModalProps {
     | 'announcement'
   type: 'create' | 'update' | 'delete'
   data?: any
-  id?: number
+  id?: number | string
 }
 
 const FormModal: React.FC<FormModalProps> = ({ table, type, data, id }) => {

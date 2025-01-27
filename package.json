@@ -9,7 +9,11 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@clerk/elements": "^0.22.14",
+    "@clerk/nextjs": "^6.10.1",
     "@hookform/resolvers": "^3.9.0",
+    "@prisma/client": "^6.2.1",
+    "bson": "^6.10.1",
     "moment": "^2.30.1",
     "next": "14.2.5",
     "react": "^18.3.1",
@@ -18,6 +22,7 @@
     "react-dom": "^18",
     "react-hook-form": "^7.52.2",
     "recharts": "^2.12.7",
+    "ts-node": "^10.9.2",
     "zod": "^3.23.8"
   },
   "devDependencies": {
@@ -28,7 +33,11 @@
     "eslint": "^8",
     "eslint-config-next": "14.2.5",
     "postcss": "^8",
+    "prisma": "^6.2.1",
     "tailwindcss": "^3.4.1",
     "typescript": "^5"
+  },
+  "prisma": {
+    "seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts"
   }
 }

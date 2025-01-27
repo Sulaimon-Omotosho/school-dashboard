@@ -120,19 +120,34 @@ const SingleStudentPage = () => {
         <div className='bg-white rounded-md p-4'>
           <h1 className='text-xl font-semibold'>Shortcuts</h1>
           <div className='mt-4 flex gap-4 flex-wrap text-xs text-gray-500'>
-            <Link href='/' className='p-3 rounded-md bg-lamaSkyLight'>
+            <Link
+              href={`/list/lessons?classId=${'678f838a61d52db1547966b5'}`}
+              className='p-3 rounded-md bg-lamaSkyLight'
+            >
               Student&apos;s Lessons
             </Link>
-            <Link href='/' className='p-3 rounded-md bg-lamaPurpleLight'>
+            <Link
+              href={`/list/teachers?classId=${'678f838a61d52db1547966b5'}`}
+              className='p-3 rounded-md bg-lamaPurpleLight'
+            >
               Student&apos;s Teachers
             </Link>
-            <Link href='/' className='p-3 rounded-md bg-pink-50'>
+            <Link
+              href={`/list/exams?classId=${'678f838a61d52db1547966b5'}`}
+              className='p-3 rounded-md bg-pink-50'
+            >
               Student&apos;s Exams
             </Link>
-            <Link href='/' className='p-3 rounded-md bg-lamaSkyLight'>
+            <Link
+              href={`/list/assignments?classId=${'678f838a61d52db1547966b5'}`}
+              className='p-3 rounded-md bg-lamaSkyLight'
+            >
               Student&apos;s Assignments
             </Link>
-            <Link href='/' className='p-3 rounded-md bg-lamaYellowLight'>
+            <Link
+              href={`/list/results?studentId=${'678f83ad61d52db1547966e0'}`}
+              className='p-3 rounded-md bg-lamaYellowLight'
+            >
               Student&apos;s Results
             </Link>
           </div>

@@ -1,6 +1,6 @@
 import React from 'react'
 
-export interface columns {
+export interface columnsType {
   header: string
   accessor: string
   className?: string
@@ -11,7 +11,7 @@ const Table = ({
   renderRow,
   data,
 }: {
-  columns: columns[]
+  columns: columnsType[]
   renderRow: (item: any) => React.ReactNode
   data: any[]
 }) => {

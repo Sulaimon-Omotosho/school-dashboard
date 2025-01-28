@@ -5,158 +5,203 @@
 
 // async function main() {
 //   // ADMIN
-//   const admin1 = await prisma.admin.create({
-//     data: {
-//       id: new ObjectId().toHexString(),
-//       username: 'admin1',
-//     },
-//   })
-//   const admin2 = await prisma.admin.create({
-//     data: {
-//       id: new ObjectId().toHexString(),
-//       username: 'admin2',
-//     },
+//   await prisma.admin.createMany({
+//     data: [
+//       { id: new ObjectId().toHexString(), username: 'admin1' },
+//       { id: new ObjectId().toHexString(), username: 'admin2' },
+//     ],
 //   })
 
 //   // GRADE
-//   const gradeIds = []
-//   for (let i = 1; i <= 6; i++) {
-//     const grade = await prisma.grade.create({
-//       data: {
-//         id: new ObjectId().toHexString(),
-//         level: i,
-//       },
-//     })
-//     gradeIds.push(grade.id)
-//   }
+//   const grades = await prisma.$transaction(
+//     Array.from({ length: 6 }, (_, i) =>
+//       prisma.grade.create({
+//         data: { id: new ObjectId().toHexString(), level: i + 1 },
+//       })
+//     )
+//   )
+//   const gradeIds = grades.map((g) => g.id)
 
 //   // CLASS
-//   const classIds = []
-//   for (const gradeId of gradeIds) {
-//     const createdClass = await prisma.class.create({
-//       data: {
-//         id: new ObjectId().toHexString(),
-//         name: `${gradeIds.indexOf(gradeId) + 1}A`,
-//         gradeId: gradeId,
-//         capacity: Math.floor(Math.random() * (20 - 15 + 1)) + 15,
-//       },
-//     })
-//     classIds.push(createdClass.id)
-//   }
+//   const classes = await prisma.$transaction(
+//     gradeIds.map((gradeId, i) =>
+//       prisma.class.create({
+//         data: {
+//           id: new ObjectId().toHexString(),
+//           name: `${i + 1}A`,
+//           gradeId,
+//           capacity: Math.floor(Math.random() * 6) + 15, // Random between 15-20
+//         },
+//       })
+//     )
+//   )
+//   const classIds = classes.map((c) => c.id)
 
 //   // SUBJECTS
-//   const subjectData = [
-//     'Mathematics',
-//     'Science',
-//     'English',
-//     'History',
-//     'Geography',
-//     'Physics',
-//     'Chemistry',
-//     'Biology',
-//     'Computer Science',
-//     'Art',
-//   ].map((name) => ({ name }))
-
-//   const createdSubjects = await prisma.$transaction(
-//     subjectData.map((subject) => prisma.subject.create({ data: subject }))
+//   const subjects = await prisma.$transaction(
+//     [
+//       'Mathematics',
+//       'Science',
+//       'English',
+//       'History',
+//       'Geography',
+//       'Physics',
+//       'Chemistry',
+//       'Biology',
+//       'Computer Science',
+//       'Art',
+//     ].map((name) => prisma.subject.create({ data: { name } }))
 //   )
-//   const subjectIds = createdSubjects.map((s) => s.id)
+//   const subjectIds = subjects.map((s) => s.id)
 
 //   // TEACHERS
-//   const teacherIds = []
-//   for (let i = 1; i <= 15; i++) {
-//     const teacher = await prisma.teacher.create({
-//       data: {
-//         id: new ObjectId().toHexString(),
-//         username: `teacher${i}`,
-//         name: `TName${i}`,
-//         surname: `TSurname${i}`,
-//         email: `teacher${i}@example.com`,
-//         phone: `123-456-789${i}`,
-//         address: `Address${i}`,
-//         bloodType: 'A+',
-//         sex: i % 2 === 0 ? UserSex.MALE : UserSex.FEMALE,
-//         subjects: { connect: { id: subjectIds[i % subjectIds.length] } }, // Connect with existing subjects
-//         classes: { connect: { id: classIds[i % classIds.length] } }, // Connect with existing classes
-//         birthday: new Date(
-//           new Date().setFullYear(new Date().getFullYear() - 30)
-//         ),
-//       },
-//     })
-//     teacherIds.push(teacher.id)
-//   }
+//   const teachers = await prisma.$transaction(
+//     Array.from({ length: 15 }, (_, i) =>
+//       prisma.teacher.create({
+//         data: {
+//           id: new ObjectId().toHexString(),
+//           username: `teacher${i + 1}`,
+//           name: `TName${i + 1}`,
+//           surname: `TSurname${i + 1}`,
+//           email: `teacher${i + 1}@example.com`,
+//           phone: `123-456-789${i + 1}`,
+//           address: `Address${i + 1}`,
+//           bloodType: 'A+',
+//           sex: i % 2 === 0 ? UserSex.MALE : UserSex.FEMALE,
+//           subjects: { connect: { id: subjectIds[i % subjectIds.length] } },
+//           classes: { connect: { id: classIds[i % classIds.length] } },
+//           birthday: new Date(
+//             new Date().setFullYear(new Date().getFullYear() - 30)
+//           ),
+//         },
+//       })
+//     )
+//   )
+//   const teacherIds = teachers.map((t) => t.id)
 
 //   // LESSONS
-//   for (let i = 1; i <= 30; i++) {
-//     await prisma.lesson.create({
-//       data: {
-//         name: `Lesson${i}`,
-//         day: Day[
-//           Object.keys(Day)[
-//             Math.floor(Math.random() * Object.keys(Day).length)
-//           ] as keyof typeof Day
-//         ],
-//         startTime: new Date(new Date().setHours(new Date().getHours() + 1)),
-//         endTime: new Date(new Date().setHours(new Date().getHours() + 3)),
-//         subjectId: subjectIds[i % subjectIds.length],
-//         classId: classIds[i % classIds.length],
-//         teacherId: teacherIds[i % teacherIds.length],
-//       },
-//     })
-//   }
+//   const lessons = await prisma.$transaction(
+//     Array.from({ length: 30 }, (_, i) =>
+//       prisma.lesson.create({
+//         data: {
+//           name: `Lesson${i + 1}`,
+//           day: Day[
+//             Object.keys(Day)[
+//               Math.floor(Math.random() * Object.keys(Day).length)
+//             ] as keyof typeof Day
+//           ],
+//           startTime: new Date(new Date().setHours(new Date().getHours() + 1)),
+//           endTime: new Date(new Date().setHours(new Date().getHours() + 3)),
+//           subjectId: subjectIds[i % subjectIds.length],
+//           classId: classIds[i % classIds.length],
+//           teacherId: teacherIds[i % teacherIds.length],
+//         },
+//       })
+//     )
+//   )
+//   const lessonIds = lessons.map((l) => l.id)
 
 //   // PARENTS
-//   const parentIds = []
-//   for (let i = 1; i <= 25; i++) {
-//     const parent = await prisma.parent.create({
-//       data: {
-//         id: new ObjectId().toHexString(),
-//         username: `parent${i}`,
-//         name: `PName${i}`,
-//         surname: `PSurname${i}`,
-//         email: `parent${i}@example.com`,
-//         phone: `123-456-789${i}`,
-//         address: `Address${i}`,
-//       },
-//     })
-//     parentIds.push(parent.id)
-//   }
+//   const parents = await prisma.$transaction(
+//     Array.from({ length: 25 }, (_, i) =>
+//       prisma.parent.create({
+//         data: {
+//           id: new ObjectId().toHexString(),
+//           username: `parent${i + 1}`,
+//           name: `PName${i + 1}`,
+//           surname: `PSurname${i + 1}`,
+//           email: `parent${i + 1}@example.com`,
+//           phone: `123-456-789${i + 1}`,
+//           address: `Address${i + 1}`,
+//         },
+//       })
+//     )
+//   )
+//   const parentIds = parents.map((p) => p.id)
 
 //   // STUDENTS
-//   for (let i = 1; i <= 50; i++) {
-//     await prisma.student.create({
-//       data: {
-//         id: new ObjectId().toHexString(),
-//         username: `student${i}`,
-//         name: `SName${i}`,
-//         surname: `SSurname${i}`,
-//         email: `student${i}@example.com`,
-//         phone: `987-654-321${i}`,
-//         address: `Address${i}`,
-//         bloodType: 'O-',
-//         sex: i % 2 === 0 ? UserSex.MALE : UserSex.FEMALE,
-//         parentId: parentIds[i % parentIds.length],
-//         gradeId: gradeIds[i % gradeIds.length],
-//         classId: classIds[i % classIds.length],
-//         birthday: new Date(
-//           new Date().setFullYear(new Date().getFullYear() - 10)
-//         ),
-//       },
-//     })
-//   }
+//   const students = await prisma.$transaction(
+//     Array.from({ length: 50 }, (_, i) =>
+//       prisma.student.create({
+//         data: {
+//           id: new ObjectId().toHexString(),
+//           username: `student${i + 1}`,
+//           name: `SName${i + 1}`,
+//           surname: `SSurname${i + 1}`,
+//           email: `student${i + 1}@example.com`,
+//           phone: `987-654-321${i + 1}`,
+//           address: `Address${i + 1}`,
+//           bloodType: 'O-',
+//           sex: i % 2 === 0 ? UserSex.MALE : UserSex.FEMALE,
+//           parentId: parentIds[i % parentIds.length],
+//           gradeId: gradeIds[i % gradeIds.length],
+//           classId: classIds[i % classIds.length],
+//           birthday: new Date(
+//             new Date().setFullYear(new Date().getFullYear() - 10)
+//           ),
+//         },
+//       })
+//     )
+//   )
+//   const studentIds = students.map((s) => s.id)
+
+//   // ASSIGNMENTS
+//   const assignments = await prisma.$transaction(
+//     Array.from({ length: 10 }, (_, i) =>
+//       prisma.assignment.create({
+//         data: {
+//           title: `Assignment ${i + 1}`,
+//           startDate: new Date(new Date().setHours(new Date().getHours() + 1)),
+//           dueDate: new Date(new Date().setDate(new Date().getDate() + 1)),
+//           lessonId: lessonIds[i % lessonIds.length],
+//         },
+//       })
+//     )
+//   )
 
 //   // EXAMS
-//   for (let i = 1; i <= 10; i++) {
-//     await prisma.exam.create({
-//       data: {
-//         title: `Exam ${i}`,
-//         startTime: new Date(new Date().setHours(new Date().getHours() + 1)),
-//         endTime: new Date(new Date().setHours(new Date().getHours() + 2)),
-//         lessonId: classIds[i % classIds.length], // Assign to existing lesson
-//       },
-//     })
-//   }
+//   const exams = await prisma.$transaction(
+//     Array.from({ length: 10 }, (_, i) =>
+//       prisma.exam.create({
+//         data: {
+//           title: `Exam ${i + 1}`,
+//           startTime: new Date(new Date().setHours(new Date().getHours() + 1)),
+//           endTime: new Date(new Date().setHours(new Date().getHours() + 2)),
+//           lessonId: lessonIds[i % lessonIds.length],
+//         },
+//       })
+//     )
+//   )
+//   const examIds = exams.map((e) => e.id)
+
+//   // RESULTS
+//   await prisma.$transaction(
+//     Array.from({ length: 10 }, (_, i) =>
+//       prisma.result.create({
+//         data: {
+//           score: 90,
+//           studentId: studentIds[i % studentIds.length],
+//           ...(i < 5
+//             ? { examId: examIds[i] }
+//             : { assignmentId: assignments[i - 5].id }),
+//         },
+//       })
+//     )
+//   )
+
+//   // ATTENDANCE
+//   await prisma.$transaction(
+//     Array.from({ length: 10 }, (_, i) =>
+//       prisma.attendance.create({
+//         data: {
+//           date: new Date(),
+//           present: true,
+//           studentId: studentIds[i % studentIds.length],
+//           lessonId: lessonIds[i % lessonIds.length],
+//         },
+//       })
+//     )
+//   )
 
 //   // ANNOUNCEMENTS & EVENTS
 //   for (let i = 1; i <= 5; i++) {

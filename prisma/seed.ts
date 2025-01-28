@@ -7,8 +7,16 @@
 //   // ADMIN
 //   await prisma.admin.createMany({
 //     data: [
-//       { id: new ObjectId().toHexString(), username: 'admin1' },
-//       { id: new ObjectId().toHexString(), username: 'admin2' },
+//       {
+//         id: new ObjectId().toHexString(),
+//         username: 'admin1',
+//         clerkId: 'clerk_admin1',
+//       },
+//       {
+//         id: new ObjectId().toHexString(),
+//         username: 'admin2',
+//         clerkId: 'clerk_admin2',
+//       },
 //     ],
 //   })
 
@@ -68,6 +76,7 @@
 //           address: `Address${i + 1}`,
 //           bloodType: 'A+',
 //           sex: i % 2 === 0 ? UserSex.MALE : UserSex.FEMALE,
+//           clerkId: `clerk_teacher${i + 1}`, // Add clerkId
 //           subjects: { connect: { id: subjectIds[i % subjectIds.length] } },
 //           classes: { connect: { id: classIds[i % classIds.length] } },
 //           birthday: new Date(
@@ -113,6 +122,7 @@
 //           email: `parent${i + 1}@example.com`,
 //           phone: `123-456-789${i + 1}`,
 //           address: `Address${i + 1}`,
+//           clerkId: `clerk_parent${i + 1}`, // Add clerkId
 //         },
 //       })
 //     )
@@ -133,6 +143,7 @@
 //           address: `Address${i + 1}`,
 //           bloodType: 'O-',
 //           sex: i % 2 === 0 ? UserSex.MALE : UserSex.FEMALE,
+//           clerkId: `clerk_student${i + 1}`, // Add clerkId
 //           parentId: parentIds[i % parentIds.length],
 //           gradeId: gradeIds[i % gradeIds.length],
 //           classId: classIds[i % classIds.length],

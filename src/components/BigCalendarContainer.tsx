@@ -1,6 +1,7 @@
 import { db } from '@/lib/db'
 import React from 'react'
 import BigCalendar from './BigCalendar'
+import { adjustWeekSchedule } from '@/lib/utils'
 
 const BigCalendarContainer = async ({
   type,
@@ -24,9 +25,12 @@ const BigCalendarContainer = async ({
       end: new Date(lesson.endTime),
     })
   )
+
+  const schedule = adjustWeekSchedule(data)
+
   return (
     <div>
-      <BigCalendar data={data} />
+      <BigCalendar data={schedule} />
     </div>
   )
 }

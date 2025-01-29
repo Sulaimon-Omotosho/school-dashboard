@@ -7,7 +7,6 @@ import { ITEMS_PER_PAGE } from '@/lib/settings'
 import { getUserData } from '@/lib/utils'
 import { Prisma } from '@prisma/client'
 import Image from 'next/image'
-import Link from 'next/link'
 
 type ResultList = {
   id: number

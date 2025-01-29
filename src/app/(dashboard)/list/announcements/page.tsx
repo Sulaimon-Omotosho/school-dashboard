@@ -85,12 +85,20 @@ const AnnouncementListPage = async ({
     parent: { students: { some: { parent: { is: { clerkId: userId! } } } } },
   }
 
-  query.OR = [
-    { classId: null },
-    {
-      class: { ...(roleConditions[role as keyof typeof roleConditions] || {}) },
-    },
-  ]
+  switch (role) {
+    case 'admin':
+      break
+    case 'teacher':
+    case 'student':
+    case 'parent':
+      query.OR = [
+        { classId: null },
+        { class: roleConditions[role as keyof typeof roleConditions] || [] },
+      ]
+      break
+    default:
+      break
+  }
 
   const [data, count] = await db.$transaction([
     db.announcement.findMany({

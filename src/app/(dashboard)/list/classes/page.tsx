@@ -7,7 +7,6 @@ import { ITEMS_PER_PAGE } from '@/lib/settings'
 import { getUserData } from '@/lib/utils'
 import { Class, Prisma, Teacher } from '@prisma/client'
 import Image from 'next/image'
-import Link from 'next/link'
 import React from 'react'
 
 type ClassList = Class & { supervisor: Teacher }

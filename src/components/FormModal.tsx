@@ -1,6 +1,6 @@
 'use client'
 
-import { deleteClass, deleteSubject } from '@/lib/actions'
+import { deleteClass, deleteSubject, deleteTeacher } from '@/lib/actions'
 import { FormModalProps } from '@/lib/types'
 import dynamic from 'next/dynamic'
 import Image from 'next/image'
@@ -12,9 +12,9 @@ import { toast } from 'react-toastify'
 const deleteActionMap = {
   subject: deleteSubject,
   class: deleteClass,
+  teacher: deleteTeacher,
   student: deleteSubject,
   parent: deleteSubject,
-  teacher: deleteSubject,
   announcement: deleteSubject,
   assignment: deleteSubject,
   attendance: deleteSubject,
@@ -53,7 +53,6 @@ const forms: {
     relatedDate?: any
   ) => JSX.Element
 } = {
-  // teacher: (setOpen, type, data) => <TeacherForm type={type} data={data} setOpen={setOpen}  />,
   // student: (setOpen, type, data) => <StudentsForm type={type} data={data} setOpen={setOpen}  />,
   // announcement: (setOpen, type, data) => <AnnouncementForm type={type} data={data} setOpen={setOpen}  />,
   // assignment: (setOpen, type, data) => <AssignmentForm type={type} data={data} setOpen={setOpen}  />,
@@ -63,6 +62,14 @@ const forms: {
   // lesson: (setOpen, type, data) => <LessonForm type={type} data={data} setOpen={setOpen}  />,
   // parent: (setOpen, type, data) => <ParentForm type={type} data={data} setOpen={setOpen}  />,
   // result: (setOpen, type, data) => <ResultForm type={type} data={data} setOpen={setOpen}  />,
+  teacher: (setOpen, type, data, relatedData) => (
+    <TeacherForm
+      type={type}
+      data={data}
+      setOpen={setOpen}
+      relatedData={relatedData || { teachers: [] }}
+    />
+  ),
   class: (setOpen, type, data, relatedData) => (
     <ClassForm
       setOpen={setOpen}

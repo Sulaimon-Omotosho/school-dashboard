@@ -143,6 +143,9 @@ const ClassForm = ({
           )}
         </div>
       </div>
+      {state.error && (
+        <span className='text-red-500'>Something went wrong, Not Created!</span>
+      )}
       <button className='bg-blue-400 text-white rounded-md p-2'>
         {type === 'create' ? 'Create' : 'Update'}
       </button>

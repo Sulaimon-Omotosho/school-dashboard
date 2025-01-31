@@ -1,6 +1,6 @@
 'use client'
 
-import { deleteSubject } from '@/lib/actions'
+import { deleteClass, deleteSubject } from '@/lib/actions'
 import { FormModalProps } from '@/lib/types'
 import dynamic from 'next/dynamic'
 import Image from 'next/image'
@@ -11,13 +11,13 @@ import { toast } from 'react-toastify'
 
 const deleteActionMap = {
   subject: deleteSubject,
+  class: deleteClass,
   student: deleteSubject,
   parent: deleteSubject,
   teacher: deleteSubject,
   announcement: deleteSubject,
   assignment: deleteSubject,
   attendance: deleteSubject,
-  class: deleteSubject,
   event: deleteSubject,
   exam: deleteSubject,
   lesson: deleteSubject,
@@ -30,18 +30,20 @@ const TeacherForm = dynamic(() => import('./forms/TeacherForm'), {
 const StudentsForm = dynamic(() => import('./forms/StudentsForm'), {
   loading: () => <h1>Loading...</h1>,
 })
+const SubjectForm = dynamic(() => import('./forms/SubjectForm'), {
+  loading: () => <h1>Loading...</h1>,
+})
+const ClassForm = dynamic(() => import('./forms/ClassForm'), {
+  loading: () => <h1>Loading...</h1>,
+})
 const AnnouncementForm = dynamic(() => import('./forms/AnnouncementForm'))
 const AssignmentForm = dynamic(() => import('./forms/AssignmentForm'))
 const AttendanceForm = dynamic(() => import('./forms/AttendanceForm'))
-const ClassForm = dynamic(() => import('./forms/ClassForm'))
 const EventForm = dynamic(() => import('./forms/EventForm'))
 const ExamForm = dynamic(() => import('./forms/ExamForm'))
 const LessonForm = dynamic(() => import('./forms/LessonForm'))
 const ParentForm = dynamic(() => import('./forms/ParentForm'))
 const ResultForm = dynamic(() => import('./forms/ResultForm'))
-const SubjectForm = dynamic(() => import('./forms/SubjectForm'), {
-  loading: () => <h1>Loading...</h1>,
-})
 
 const forms: {
   [key: string]: (
@@ -56,12 +58,19 @@ const forms: {
   // announcement: (setOpen, type, data) => <AnnouncementForm type={type} data={data} setOpen={setOpen}  />,
   // assignment: (setOpen, type, data) => <AssignmentForm type={type} data={data} setOpen={setOpen}  />,
   // attendance: (setOpen, type, data) => <AttendanceForm type={type} data={data} setOpen={setOpen}  />,
-  // class: (setOpen, type, data) => <ClassForm type={type} data={data} setOpen={setOpen}  />,
   // event: (setOpen, type, data) => <EventForm type={type} data={data} setOpen={setOpen}  />,
   // exam: (setOpen, type, data) => <ExamForm type={type} data={data} setOpen={setOpen}  />,
   // lesson: (setOpen, type, data) => <LessonForm type={type} data={data} setOpen={setOpen}  />,
   // parent: (setOpen, type, data) => <ParentForm type={type} data={data} setOpen={setOpen}  />,
   // result: (setOpen, type, data) => <ResultForm type={type} data={data} setOpen={setOpen}  />,
+  class: (setOpen, type, data, relatedData) => (
+    <ClassForm
+      setOpen={setOpen}
+      type={type}
+      data={data}
+      relatedData={relatedData || { teachers: [] }}
+    />
+  ),
   subject: (setOpen, type, data, relatedData) => (
     <SubjectForm
       type={type}
@@ -98,7 +107,7 @@ const FormModal = ({
 
   useEffect(() => {
     if (state.success) {
-      toast(`Subject has been deleted!`)
+      toast(`Data has been deleted!`)
       setOpen(false)
       router.refresh()
     }

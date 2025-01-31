@@ -1,3 +1,4 @@
+import FormContainer from '@/components/FormContainer'
 import FormModal from '@/components/FormModal'
 import Pagination from '@/components/Pagination'
 import Table from '@/components/Table'
@@ -11,28 +12,6 @@ import React from 'react'
 
 type ClassList = Class & { supervisor: Teacher }
 
-const columns = [
-  {
-    header: 'Class Name',
-    accessor: 'class',
-  },
-  {
-    header: 'Capacity',
-    accessor: 'capacity',
-    className: 'hidden md:table-cell',
-  },
-  {
-    header: 'Grade',
-    accessor: 'grade',
-    className: 'hidden md:table-cell',
-  },
-  {
-    header: 'Supervisor',
-    accessor: 'supervisor',
-    className: 'hidden md:table-cell',
-  },
-]
-
 const ClassListPage = async ({
   searchParams,
 }: {
@@ -43,12 +22,35 @@ const ClassListPage = async ({
 
   const { userId, role } = await getUserData()
 
-  if (role === 'admin') {
-    columns.push({
-      header: 'Actions',
-      accessor: 'actions',
-    })
-  }
+  const columns = [
+    {
+      header: 'Class Name',
+      accessor: 'class',
+    },
+    {
+      header: 'Capacity',
+      accessor: 'capacity',
+      className: 'hidden md:table-cell',
+    },
+    {
+      header: 'Grade',
+      accessor: 'grade',
+      className: 'hidden md:table-cell',
+    },
+    {
+      header: 'Supervisor',
+      accessor: 'supervisor',
+      className: 'hidden md:table-cell',
+    },
+    ...(role === 'admin'
+      ? [
+          {
+            header: 'Actions',
+            accessor: 'actions',
+          },
+        ]
+      : []),
+  ]
 
   const renderRow = (item: ClassList) => (
     <tr
@@ -65,8 +67,8 @@ const ClassListPage = async ({
         <div className='flex items-center gap-2'>
           {role === 'admin' && (
             <>
-              <FormModal table='class' type='update' data={item} />
-              <FormModal table='class' type='delete' id={item.id} />
+              <FormContainer table='class' type='update' data={item} />
+              <FormContainer table='class' type='delete' id={item.id} />
             </>
           )}
         </div>
@@ -126,7 +128,7 @@ const ClassListPage = async ({
             <button className='w-8 h-8 flex items-center justify-center bg-lamaYellow rounded-full'>
               <Image src='/sort.png' alt='sort button' width={14} height={14} />
             </button>
-            {role === 'admin' && <FormModal table='class' type='create' />}
+            {role === 'admin' && <FormContainer table='class' type='create' />}
           </div>
         </div>
       </div>

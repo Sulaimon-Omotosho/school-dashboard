@@ -2,7 +2,7 @@
 
 import { revalidatePath } from 'next/cache'
 import { db } from './db'
-import { SubjectSchema } from './formValidation'
+import { ClassSchema, SubjectSchema } from './formValidation'
 
 export type CurrentState = { success: boolean; error: boolean }
 
@@ -59,6 +59,66 @@ export const deleteSubject = async (
   const id = data.get('id') as string
   try {
     await db.subject.delete({
+      where: {
+        id: id,
+      },
+    })
+
+    return { success: true, error: false }
+  } catch (error) {
+    console.log(error)
+    return { success: false, error: true }
+  }
+}
+
+// CLASS
+export const createClass = async (
+  currentState: CurrentState,
+  data: ClassSchema
+) => {
+  try {
+    await db.class.create({
+      data,
+    })
+
+    return { success: true, error: false }
+  } catch (error) {
+    console.log(error)
+    return { success: false, error: true }
+  }
+}
+
+export const updateClass = async (
+  currentState: CurrentState,
+  data: ClassSchema
+) => {
+  try {
+    await db.class.update({
+      where: {
+        id: data.id,
+      },
+      data: {
+        name: data.name,
+        capacity: data.capacity,
+        gradeId: data.gradeId,
+        supervisorId: data?.supervisorId,
+      },
+    })
+
+    return { success: true, error: false }
+  } catch (error) {
+    console.log(error)
+    return { success: false, error: true }
+  }
+}
+
+export const deleteClass = async (
+  currentState: CurrentState,
+  data: FormData
+) => {
+  const id = data.get('id') as string
+  try {
+    await db.class.delete({
       where: {
         id: id,
       },

@@ -1,16 +1,32 @@
 import { db } from '@/lib/db'
+import { getUserData } from '@/lib/utils'
 import React from 'react'
 import { date } from 'zod'
 
 const EventList = async ({ dateParam }: { dateParam: string | undefined }) => {
+  const { role, userId } = await getUserData()
+
+  const roleConditions = {
+    teacher: { lessons: { some: { teacher: { is: { clerkId: userId! } } } } },
+    student: { students: { some: { clerkId: userId! } } },
+    parent: { students: { some: { parent: { is: { clerkId: userId! } } } } },
+  }
+
   const date = dateParam ? new Date(dateParam) : new Date()
 
   const data = await db.event.findMany({
+    take: 5,
     where: {
       startTime: {
         gte: new Date(date.setHours(0, 0, 0, 0)),
         lte: new Date(date.setHours(23, 59, 59, 999)),
       },
+      ...(role !== 'admin' && {
+        OR: [
+          { classId: null },
+          { class: roleConditions[role as keyof typeof roleConditions] || [] },
+        ],
+      }),
     },
   })
 

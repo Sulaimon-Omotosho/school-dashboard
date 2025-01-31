@@ -1,8 +1,27 @@
 'use client'
 
+import { deleteSubject } from '@/lib/actions'
 import dynamic from 'next/dynamic'
 import Image from 'next/image'
-import React, { useState } from 'react'
+import { useRouter } from 'next/navigation'
+import React, { Dispatch, SetStateAction, useEffect, useState } from 'react'
+import { useFormState } from 'react-dom'
+import { toast } from 'react-toastify'
+
+const deleteActionMap = {
+  subject: deleteSubject,
+  student: deleteSubject,
+  parent: deleteSubject,
+  teacher: deleteSubject,
+  announcement: deleteSubject,
+  assignment: deleteSubject,
+  attendance: deleteSubject,
+  class: deleteSubject,
+  event: deleteSubject,
+  exam: deleteSubject,
+  lesson: deleteSubject,
+  result: deleteSubject,
+}
 
 const TeacherForm = dynamic(() => import('./forms/TeacherForm'), {
   loading: () => <h1>Loading...</h1>,
@@ -19,23 +38,31 @@ const ExamForm = dynamic(() => import('./forms/ExamForm'))
 const LessonForm = dynamic(() => import('./forms/LessonForm'))
 const ParentForm = dynamic(() => import('./forms/ParentForm'))
 const ResultForm = dynamic(() => import('./forms/ResultForm'))
-const SubjectForm = dynamic(() => import('./forms/SubjectForm'))
+const SubjectForm = dynamic(() => import('./forms/SubjectForm'), {
+  loading: () => <h1>Loading...</h1>,
+})
 
 const forms: {
-  [key: string]: (type: 'create' | 'update', data?: any) => JSX.Element
+  [key: string]: (
+    setOpen: Dispatch<SetStateAction<boolean>>,
+    type: 'create' | 'update',
+    data?: any
+  ) => JSX.Element
 } = {
-  teacher: (type, data) => <TeacherForm type={type} data={data} />,
-  student: (type, data) => <StudentsForm type={type} data={data} />,
-  announcement: (type, data) => <AnnouncementForm type={type} data={data} />,
-  assignment: (type, data) => <AssignmentForm type={type} data={data} />,
-  attendance: (type, data) => <AttendanceForm type={type} data={data} />,
-  class: (type, data) => <ClassForm type={type} data={data} />,
-  event: (type, data) => <EventForm type={type} data={data} />,
-  exam: (type, data) => <ExamForm type={type} data={data} />,
-  lesson: (type, data) => <LessonForm type={type} data={data} />,
-  parent: (type, data) => <ParentForm type={type} data={data} />,
-  result: (type, data) => <ResultForm type={type} data={data} />,
-  subject: (type, data) => <SubjectForm type={type} data={data} />,
+  // teacher: (setOpen, type, data) => <TeacherForm type={type} data={data} setOpen={setOpen}  />,
+  // student: (setOpen, type, data) => <StudentsForm type={type} data={data} setOpen={setOpen}  />,
+  // announcement: (setOpen, type, data) => <AnnouncementForm type={type} data={data} setOpen={setOpen}  />,
+  // assignment: (setOpen, type, data) => <AssignmentForm type={type} data={data} setOpen={setOpen}  />,
+  // attendance: (setOpen, type, data) => <AttendanceForm type={type} data={data} setOpen={setOpen}  />,
+  // class: (setOpen, type, data) => <ClassForm type={type} data={data} setOpen={setOpen}  />,
+  // event: (setOpen, type, data) => <EventForm type={type} data={data} setOpen={setOpen}  />,
+  // exam: (setOpen, type, data) => <ExamForm type={type} data={data} setOpen={setOpen}  />,
+  // lesson: (setOpen, type, data) => <LessonForm type={type} data={data} setOpen={setOpen}  />,
+  // parent: (setOpen, type, data) => <ParentForm type={type} data={data} setOpen={setOpen}  />,
+  // result: (setOpen, type, data) => <ResultForm type={type} data={data} setOpen={setOpen}  />,
+  subject: (setOpen, type, data) => (
+    <SubjectForm type={type} data={data} setOpen={setOpen} />
+  ),
 }
 
 interface FormModalProps {
@@ -68,13 +95,29 @@ const FormModal: React.FC<FormModalProps> = ({ table, type, data, id }) => {
 
   const [open, setOpen] = useState(false)
 
+  const [state, formAction] = useFormState(deleteActionMap[table], {
+    success: false,
+    error: false,
+  })
+
+  const router = useRouter()
+
+  useEffect(() => {
+    if (state.success) {
+      toast(`Subject has been deleted!`)
+      setOpen(false)
+      router.refresh()
+    }
+  }, [state])
+
   const Form = () => {
     return type === 'delete' && id ? (
       <form
-        action={''}
+        action={formAction}
         className='p-4 flex flex-col
       gap-4 '
       >
+        <input type='text | number' name='id' value={id} hidden />
         <span className='text-center font-medium'>
           Are you sure you want to delete all data of {table}?
         </span>
@@ -83,7 +126,7 @@ const FormModal: React.FC<FormModalProps> = ({ table, type, data, id }) => {
         </button>
       </form>
     ) : type === 'create' || type === 'update' ? (
-      forms[table](type, data)
+      forms[table](setOpen, type, data)
     ) : (
       'Form not found!'
     )

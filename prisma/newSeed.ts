@@ -240,82 +240,58 @@
 //   )
 
 //   // LESSONS
-//   // Get the current week's Monday
-//   const today = new Date()
-//   const currentDay = today.getDay() // 0 (Sun) to 6 (Sat)
-//   const monday = new Date(today)
-//   monday.setDate(today.getDate() - (currentDay === 0 ? 6 : currentDay - 1)) // Adjust to Monday
-//   monday.setHours(0, 0, 0, 0)
+//   await prisma.lesson.createMany({
+//     data: Array.from({ length: 30 }, (_, i) => {
+//       // Generate a random hour between 8 and 15 (8:00 AM to 3:00 PM)
+//       const startHour = Math.floor(Math.random() * 8) + 8 // Random hour between 8 and 15
+//       const startMinute = Math.floor(Math.random() * 60) // Random minute between 0 and 59
 
-//   const lessons = await prisma.$transaction(
-//     Array.from({ length: 30 }, (_, i) => {
-//       const startHour = Math.floor(Math.random() * 8) + 8 // Between 8 AM - 3 PM
-//       const startMinute = Math.floor(Math.random() * 60)
+//       // Create a Date object for start time (randomized hour and minute)
+//       const startTime = new Date()
+//       startTime.setHours(startHour, startMinute, 0, 0)
 
-//       // Assign a weekday (Monday to Friday)
-//       const lessonDate = new Date(monday)
-//       lessonDate.setDate(monday.getDate() + (i % 5)) // Cycle through Mon-Fri
-//       lessonDate.setHours(startHour, startMinute, 0, 0)
-
-//       const endTime = new Date(lessonDate.getTime() + 60 * 60 * 1000) // 1-hour lesson
-
-//       return prisma.lesson.create({
-//         data: {
-//           name: `Lesson ${i + 1}`,
-//           day: Object.values(Day)[i % 5], // Assigns day from Monday-Friday
-//           startTime: lessonDate,
-//           endTime,
-//           subjectId: subjectIds[i % subjectIds.length],
-//           classId: classIds[i % classIds.length],
-//           teacherId: teacherIds[i % teacherIds.length],
-//         },
-//       })
-//     })
-//   )
-//   const lessonIds = lessons.map((l) => l.id)
-
-//   // Create Exams
-//   const exams = await prisma.$transaction(
-//     Array.from({ length: 23 }, (_, i) =>
-//       prisma.exam.create({
-//         data: {
-//           title: `Exam ${i + 1}`,
-//           startTime: new Date(),
-//           endTime: new Date(new Date().setHours(new Date().getHours() + 2)),
-//           lessonId: lessonIds[i % lessonIds.length],
-//         },
-//       })
-//     )
-//   )
-//   const examIds = exams.map((e) => e.id)
-
-//   // Create Assignments
-//   const assignments = await prisma.$transaction(
-//     Array.from({ length: 20 }, (_, i) =>
-//       prisma.assignment.create({
-//         data: {
-//           title: `Assignment ${i + 1}`,
-//           startDate: new Date(),
-//           dueDate: new Date(new Date().setDate(new Date().getDate() + 7)),
-//           lessonId: lessonIds[i % lessonIds.length],
-//         },
-//       })
-//     )
-//   )
-//   const assignmentIds = assignments.map((a) => a.id)
-
-//   // Create Results
-//   await prisma.result.createMany({
-//     data: students.map((student, i) => {
-//       const isExam = Math.random() > 0.5 // Randomly assign to either an exam or assignment
+//       // End time is 1 hour later
+//       const endTime = new Date(startTime.getTime() + 60 * 60 * 1000)
 
 //       return {
-//         score: Math.floor(Math.random() * 100),
-//         studentId: student.id,
-//         examId: isExam ? examIds[i % examIds.length] : null,
-//         assignmentId: !isExam ? assignmentIds[i % assignmentIds.length] : null,
+//         name: `Lesson ${i + 1}`,
+//         day: Object.values(Day)[i % Object.values(Day).length],
+//         startTime,
+//         endTime,
+//         subjectId: subjectIds[i % subjectIds.length],
+//         classId: classIds[i % classIds.length],
+//         teacherId: teacherIds[i % teacherIds.length],
 //       }
 //     }),
+//   })
+//   const lessonIds = lessons.map((l) => l.id)
+
+//   // ASSIGNMENTS
+//   await prisma.assignment.createMany({
+//     data: Array.from({ length: 20 }, (_, i) => ({
+//       title: `Assignment ${i + 1}`,
+//       startDate: new Date(),
+//       dueDate: new Date(new Date().setDate(new Date().getDate() + 7)),
+//       lessonId: lessonIds[i % lessonIds.length],
+//     })),
+//   })
+
+//   // EXAMS
+//   await prisma.exam.createMany({
+//     data: Array.from({ length: 23 }, (_, i) => ({
+//       title: `Exam ${i + 1}`,
+//       startTime: new Date(),
+//       endTime: new Date(new Date().setHours(new Date().getHours() + 2)),
+//       lessonId: lessonIds[i % lessonIds.length],
+//     })),
+//   })
+
+//   // RESULTS
+//   await prisma.result.createMany({
+//     data: students.map((student, i) => ({
+//       score: Math.floor(Math.random() * 100),
+//       studentId: student.id,
+//     })),
 //   })
 
 //   // ATTENDANCE
@@ -345,7 +321,6 @@
 //       title: `Announcement ${i + 1}`,
 //       description: 'Detailed description of the school announcement.',
 //       date: new Date(),
-//       classId: classIds[i % classIds.length],
 //     })),
 //   })
 

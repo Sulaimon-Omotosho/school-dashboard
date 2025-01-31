@@ -29,7 +29,7 @@ const BigCalendarContainer = async ({
   const schedule = adjustWeekSchedule(data)
 
   return (
-    <div>
+    <div className=''>
       <BigCalendar data={schedule} />
     </div>
   )

@@ -1,10 +1,13 @@
 'use server'
 
-import { revalidatePath } from 'next/cache'
 import { db } from './db'
-import { ClassSchema, SubjectSchema, TeacherSchema } from './formValidation'
-import { clerkClient, createClerkClient } from '@clerk/nextjs/server'
-// import { clerkClient } from '@clerk/nextjs/server'
+import {
+  ClassSchema,
+  StudentSchema,
+  SubjectSchema,
+  TeacherSchema,
+} from './formValidation'
+import { clerkClient } from '@clerk/nextjs/server'
 
 export type CurrentState = { success: boolean; error: boolean }
 
@@ -245,6 +248,134 @@ export const deleteTeacher = async (
       await clerk.users.deleteUser(clerkId.clerkId)
 
       await db.teacher.delete({
+        where: {
+          id,
+        },
+      })
+
+      return { success: true, error: false }
+    } catch (error) {
+      console.log(error)
+      return { success: false, error: true }
+    }
+  }
+}
+
+// STUDENT
+export const createStudent = async (
+  currentState: CurrentState,
+  data: StudentSchema
+) => {
+  try {
+    const classItem = await db.class.findUnique({
+      where: { id: data.classId },
+      include: { _count: { select: { students: true } } },
+    })
+
+    if (classItem && classItem.capacity === classItem._count.students) {
+      return { success: false, error: true }
+    }
+
+    const clerk = await clerkClient()
+
+    const user = await clerk.users.createUser({
+      username: data.username,
+      password: data.password,
+      firstName: data.name,
+      lastName: data.surname,
+      publicMetadata: { role: 'student' },
+      emailAddress: [data.email as string],
+    })
+
+    await db.student.create({
+      data: {
+        clerkId: user.id,
+        username: data.username,
+        name: data.name,
+        surname: data.surname,
+        email: data.email,
+        phone: data.phone,
+        address: data.address,
+        img: data.img,
+        bloodType: data.bloodType,
+        sex: data.sex,
+        birthday: data.birthday,
+        gradeId: data.gradeId,
+        classId: data.classId,
+        parentId: data.parentId,
+      },
+    })
+
+    return { success: true, error: false }
+  } catch (error) {
+    console.log(error)
+    return { success: false, error: true }
+  }
+}
+
+export const updateStudent = async (
+  currentState: CurrentState,
+  data: StudentSchema
+) => {
+  try {
+    const clerk = await clerkClient()
+
+    const user = await clerk.users.updateUser(data.clerkId as string, {
+      username: data.username,
+      ...(data.password ? { password: data.password } : {}),
+      firstName: data.name,
+      lastName: data.surname,
+      publicMetadata: { role: 'teacher' },
+    })
+
+    await db.student.update({
+      where: {
+        id: data.id,
+      },
+      data: {
+        username: data.username,
+        name: data.name,
+        surname: data.surname,
+        email: data.email,
+        phone: data.phone,
+        address: data.address,
+        img: data.img,
+        bloodType: data.bloodType,
+        sex: data.sex,
+        birthday: data.birthday,
+        gradeId: data.gradeId,
+        classId: data.classId,
+        parentId: data.parentId,
+      },
+    })
+
+    return { success: true, error: false }
+  } catch (error) {
+    console.log(error)
+    return { success: false, error: true }
+  }
+}
+
+export const deleteStudent = async (
+  currentState: CurrentState,
+  data: FormData
+) => {
+  const id = data.get('id') as string
+  const clerkId = await db.student.findUnique({
+    where: {
+      id,
+    },
+    select: {
+      clerkId: true,
+    },
+  })
+
+  if (clerkId) {
+    try {
+      const clerk = await clerkClient()
+      await clerk.users.deleteUser(clerkId.clerkId)
+
+      await db.student.delete({
         where: {
           id,
         },

@@ -1,6 +1,11 @@
 'use client'
 
-import { deleteClass, deleteSubject, deleteTeacher } from '@/lib/actions'
+import {
+  deleteClass,
+  deleteStudent,
+  deleteSubject,
+  deleteTeacher,
+} from '@/lib/actions'
 import { FormModalProps } from '@/lib/types'
 import dynamic from 'next/dynamic'
 import Image from 'next/image'
@@ -13,7 +18,7 @@ const deleteActionMap = {
   subject: deleteSubject,
   class: deleteClass,
   teacher: deleteTeacher,
-  student: deleteSubject,
+  student: deleteStudent,
   parent: deleteSubject,
   announcement: deleteSubject,
   assignment: deleteSubject,
@@ -53,7 +58,6 @@ const forms: {
     relatedDate?: any
   ) => JSX.Element
 } = {
-  // student: (setOpen, type, data) => <StudentsForm type={type} data={data} setOpen={setOpen}  />,
   // announcement: (setOpen, type, data) => <AnnouncementForm type={type} data={data} setOpen={setOpen}  />,
   // assignment: (setOpen, type, data) => <AssignmentForm type={type} data={data} setOpen={setOpen}  />,
   // attendance: (setOpen, type, data) => <AttendanceForm type={type} data={data} setOpen={setOpen}  />,
@@ -62,6 +66,15 @@ const forms: {
   // lesson: (setOpen, type, data) => <LessonForm type={type} data={data} setOpen={setOpen}  />,
   // parent: (setOpen, type, data) => <ParentForm type={type} data={data} setOpen={setOpen}  />,
   // result: (setOpen, type, data) => <ResultForm type={type} data={data} setOpen={setOpen}  />,
+
+  student: (setOpen, type, data, relatedData) => (
+    <StudentsForm
+      type={type}
+      data={data}
+      setOpen={setOpen}
+      relatedData={relatedData}
+    />
+  ),
   teacher: (setOpen, type, data, relatedData) => (
     <TeacherForm
       type={type}

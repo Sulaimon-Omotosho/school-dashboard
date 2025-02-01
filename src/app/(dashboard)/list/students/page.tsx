@@ -1,4 +1,4 @@
-import FormModal from '@/components/FormModal'
+import FormContainer from '@/components/FormContainer'
 import Pagination from '@/components/Pagination'
 import Table from '@/components/Table'
 import TableSearch from '@/components/TableSearch'
@@ -87,7 +87,7 @@ const StudentsListPage = async ({
             </button>
           </Link>
           {role === 'admin' && (
-            <FormModal table='student' type='delete' id={item.id} />
+            <FormContainer table='student' type='delete' id={item.id} />
           )}
         </div>
       </td>
@@ -132,7 +132,6 @@ const StudentsListPage = async ({
     }),
     db.student.count({ where: query }),
   ])
-  // console.log(count)
 
   return (
     <div className='bg-white p-4 rounded-md flex-1 m-4 mt-0'>
@@ -153,7 +152,9 @@ const StudentsListPage = async ({
             <button className='w-8 h-8 flex items-center justify-center bg-lamaYellow rounded-full'>
               <Image src='/sort.png' alt='sort button' width={14} height={14} />
             </button>
-            {role === 'admin' && <FormModal table='student' type='create' />}
+            {role === 'admin' && (
+              <FormContainer table='student' type='create' />
+            )}
           </div>
         </div>
       </div>

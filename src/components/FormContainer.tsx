@@ -29,6 +29,15 @@ const FormContainer = async ({ table, type, data, id }: FormModalProps) => {
         })
         relatedData = { teachers: classTeachers, grades: classGrades }
         break
+      case 'student':
+        const studentGrades = await db.grade.findMany({
+          select: { id: true, level: true },
+        })
+        const studentClasses = await db.class.findMany({
+          include: { _count: { select: { students: true } } },
+        })
+        relatedData = { grades: studentGrades, classes: studentClasses }
+        break
       default:
         break
     }

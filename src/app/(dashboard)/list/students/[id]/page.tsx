@@ -1,5 +1,6 @@
 import Announcement from '@/components/Announcement'
 import BigCalendarContainer from '@/components/BigCalendarContainer'
+import FormContainer from '@/components/FormContainer'
 import Performance from '@/components/Performance'
 import StudentAttCard from '@/components/StudentAttCard'
 import { db } from '@/lib/db'
@@ -49,9 +50,14 @@ const SingleStudentPage = async ({
               />
             </div>
             <div className='w-2/3 flex flex-col justify-between gap-4'>
-              <h1 className='text-xl font-semibold'>
-                {student.name + ' ' + student.surname}
-              </h1>
+              <div className='flex items-center gap-4'>
+                <h1 className='text-xl font-semibold'>
+                  {student.name + ' ' + student.surname}
+                </h1>
+                {role === 'admin' && (
+                  <FormContainer table='student' type='update' data={student} />
+                )}
+              </div>
               <p className='text-sm text-gray-500'>
                 Lorem ipsum dolor, sit amet consectetur adipisicing elit. Alias
                 quas voluptatum quidem?

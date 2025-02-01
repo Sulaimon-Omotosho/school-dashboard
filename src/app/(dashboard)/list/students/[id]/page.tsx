@@ -1,6 +1,7 @@
 import Announcement from '@/components/Announcement'
-import BigCalendar from '@/components/BigCalendar'
+import BigCalendarContainer from '@/components/BigCalendarContainer'
 import Performance from '@/components/Performance'
+import StudentAttCard from '@/components/StudentAttCard'
 import { db } from '@/lib/db'
 import { getUserData } from '@/lib/utils'
 import { Class, Student } from '@prisma/client'
@@ -18,12 +19,12 @@ const SingleStudentPage = async ({
 
   const student:
     | (Student & {
-        class: Class
+        class: Class & { _count: { lessons: number } }
       })
     | null = await db.student.findUnique({
     where: { id },
     include: {
-      class: true,
+      class: { include: { _count: { select: { lessons: true } } } },
     },
   })
 
@@ -62,15 +63,18 @@ const SingleStudentPage = async ({
                 </div>
                 <div className='w-full md:w-1/3 lg:w-full 2xl:w-1/3 flex items-center gap-2'>
                   <Image src='/date.png' alt='icon' width={14} height={14} />
-                  <span>August 2024</span>
+                  <span>
+                    {' '}
+                    {new Intl.DateTimeFormat('en-US').format(student.birthday)}
+                  </span>
                 </div>
                 <div className='w-full md:w-1/3 lg:w-full 2xl:w-1/3 flex items-center gap-2'>
                   <Image src='/mail.png' alt='icon' width={14} height={14} />
-                  <span>user@gmail.com</span>
+                  <span>{student.email || '-'}</span>
                 </div>
                 <div className='w-full md:w-1/3 lg:w-full 2xl:w-1/3 flex items-center gap-2'>
                   <Image src='/phone.png' alt='icon' width={14} height={14} />
-                  <span>+1 234 567 8901</span>
+                  <span>{student.phone || '-'}</span>
                 </div>
               </div>
             </div>
@@ -86,10 +90,7 @@ const SingleStudentPage = async ({
                 height={24}
                 className='w-6 h-6'
               />
-              <div className=''>
-                <h1 className='text-xl font-semibold'>90%</h1>
-                <span className=' text-sm text-gray-400'>Attendance</span>
-              </div>
+              <StudentAttCard id={id} />
             </div>
             {/* CARD  */}
             <div className='w-full bg-white p-4 rounded-md flex gap-4 md:w-[48%] xl:w-[45%] 2xl:w-[48%]'>
@@ -101,7 +102,9 @@ const SingleStudentPage = async ({
                 className='w-6 h-6'
               />
               <div className=''>
-                <h1 className='text-xl font-semibold'>6th</h1>
+                <h1 className='text-xl font-semibold'>
+                  {student.class.name.charAt(0)}
+                </h1>
                 <span className=' text-sm text-gray-400'>Grade</span>
               </div>
             </div>
@@ -115,7 +118,9 @@ const SingleStudentPage = async ({
                 className='w-6 h-6'
               />
               <div className=''>
-                <h1 className='text-xl font-semibold'>16</h1>
+                <h1 className='text-xl font-semibold'>
+                  {student.class._count.lessons}
+                </h1>
                 <span className=' text-sm text-gray-400'>Lessons</span>
               </div>
             </div>
@@ -129,7 +134,7 @@ const SingleStudentPage = async ({
                 className='w-6 h-6'
               />
               <div className=''>
-                <h1 className='text-xl font-semibold'>5B</h1>
+                <h1 className='text-xl font-semibold'>{student.class.name}</h1>
                 <span className=' text-sm text-gray-400'>Classes</span>
               </div>
             </div>
@@ -138,7 +143,7 @@ const SingleStudentPage = async ({
         {/* BOTTOM  */}
         <div className='mt-4 bg-white rounded-md p-4 h-[800px]'>
           <h1 className=''>Teacher&apos;s Schedule</h1>
-          {/* <BigCalendar /> */}
+          <BigCalendarContainer type='classId' id={student.class.id} />
         </div>
       </div>
       {/* RIGHT  */}

@@ -67,6 +67,26 @@ const TeacherForm = ({
       </span>
 
       <div className='flex justify-between flex-wrap gap-4'>
+        {data && (
+          <InputField
+            label='Id'
+            name='id'
+            defaultValue={data?.id}
+            register={register}
+            error={errors?.id}
+            hidden
+          />
+        )}
+        {data && (
+          <InputField
+            label='ClerkId'
+            name='clerkId'
+            defaultValue={data?.clerkId}
+            register={register}
+            error={errors?.id}
+            hidden
+          />
+        )}
         <InputField
           label='Username'
           name='username'
@@ -135,7 +155,7 @@ const TeacherForm = ({
           label='Birthday'
           name='birthday'
           type='date'
-          defaultValue={data?.birthday}
+          defaultValue={data?.birthday.toISOString().split('T')[0]}
           register={register}
           error={errors?.birthday}
         />

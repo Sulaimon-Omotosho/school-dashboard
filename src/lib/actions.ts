@@ -183,12 +183,36 @@ export const updateTeacher = async (
   data: TeacherSchema
 ) => {
   try {
+    const clerk = await clerkClient()
+
+    const user = await clerk.users.updateUser(data.clerkId as string, {
+      username: data.username,
+      ...(data.password ? { password: data.password } : {}),
+      firstName: data.name,
+      lastName: data.surname,
+      publicMetadata: { role: 'teacher' },
+    })
+
     await db.teacher.update({
       where: {
         id: data.id,
       },
       data: {
+        username: data.username,
         name: data.name,
+        surname: data.surname,
+        email: data.email,
+        phone: data.phone,
+        address: data.address,
+        img: data.img,
+        bloodType: data.bloodType,
+        sex: data.sex,
+        birthday: data.birthday,
+        subjects: {
+          set: data.subjects?.map((subjectId: string) => ({
+            id: subjectId,
+          })),
+        },
       },
     })
 
@@ -204,16 +228,32 @@ export const deleteTeacher = async (
   data: FormData
 ) => {
   const id = data.get('id') as string
-  try {
-    await db.teacher.delete({
-      where: {
-        id: id,
-      },
-    })
+  const clerkId = await db.teacher.findUnique({
+    where: {
+      id,
+    },
+    select: {
+      clerkId: true,
+    },
+  })
+  // console.log(clerkId)
 
-    return { success: true, error: false }
-  } catch (error) {
-    console.log(error)
-    return { success: false, error: true }
+  if (clerkId) {
+    try {
+      // Delete from Clerk if `clerkId` exists
+      const clerk = await clerkClient()
+      await clerk.users.deleteUser(clerkId.clerkId)
+
+      await db.teacher.delete({
+        where: {
+          id,
+        },
+      })
+
+      return { success: true, error: false }
+    } catch (error) {
+      console.log(error)
+      return { success: false, error: true }
+    }
   }
 }

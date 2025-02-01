@@ -105,22 +105,23 @@ const FormModal = ({
 
   const [open, setOpen] = useState(false)
 
-  const [state, formAction] = useFormState(deleteActionMap[table], {
-    success: false,
-    error: false,
-  })
-
-  const router = useRouter()
-
-  useEffect(() => {
-    if (state.success) {
-      toast(`Data has been deleted!`)
-      setOpen(false)
-      router.refresh()
-    }
-  }, [state])
-
   const Form = () => {
+    const [state, formAction] = useFormState(deleteActionMap[table], {
+      // const [state, formAction] = useFormState((state, data: FormData) => deleteActionMap[table](state, data), {
+      success: false,
+      error: false,
+    })
+
+    const router = useRouter()
+
+    useEffect(() => {
+      if (state?.success) {
+        toast(`Data has been deleted!`)
+        setOpen(false)
+        router.refresh()
+      }
+    }, [state, router])
+
     return type === 'delete' && id ? (
       <form
         action={formAction}

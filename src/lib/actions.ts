@@ -3,11 +3,13 @@
 import { db } from './db'
 import {
   ClassSchema,
+  ExamSchema,
   StudentSchema,
   SubjectSchema,
   TeacherSchema,
 } from './formValidation'
 import { clerkClient } from '@clerk/nextjs/server'
+import { getUserData } from './utils'
 
 export type CurrentState = { success: boolean; error: boolean }
 
@@ -64,6 +66,109 @@ export const deleteSubject = async (
   const id = data.get('id') as string
   try {
     await db.subject.delete({
+      where: {
+        id: id,
+      },
+    })
+
+    return { success: true, error: false }
+  } catch (error) {
+    console.log(error)
+    return { success: false, error: true }
+  }
+}
+
+// EXAM
+export const createExam = async (
+  currentState: CurrentState,
+  data: ExamSchema
+) => {
+  const { role, userId } = await getUserData()
+
+  try {
+    if (role === 'teacher') {
+      const teacherLesson = db.lesson.findFirst({
+        where: {
+          teacher: {
+            is: {
+              clerkId: userId!,
+              id: data.lessonId,
+            },
+          },
+        },
+      })
+
+      if (!teacherLesson) {
+        return { success: false, error: true }
+      }
+    }
+
+    await db.exam.create({
+      data: {
+        title: data.title,
+        startTime: data.startTime,
+        endTime: data.endTime,
+        lessonId: data.lessonId,
+      },
+    })
+
+    return { success: true, error: false }
+  } catch (error) {
+    console.log(error)
+    return { success: false, error: true }
+  }
+}
+
+export const updateExam = async (
+  currentState: CurrentState,
+  data: ExamSchema
+) => {
+  const { role, userId } = await getUserData()
+
+  try {
+    if (role === 'teacher') {
+      const teacherLesson = db.lesson.findFirst({
+        where: {
+          teacher: {
+            is: {
+              clerkId: userId!,
+              id: data.lessonId,
+            },
+          },
+        },
+      })
+
+      if (!teacherLesson) {
+        return { success: false, error: true }
+      }
+    }
+
+    await db.exam.update({
+      where: {
+        id: data.id,
+      },
+      data: {
+        title: data.title,
+        startTime: data.startTime,
+        endTime: data.endTime,
+        lessonId: data.lessonId,
+      },
+    })
+
+    return { success: true, error: false }
+  } catch (error) {
+    console.log(error)
+    return { success: false, error: true }
+  }
+}
+
+export const deleteExam = async (
+  currentState: CurrentState,
+  data: FormData
+) => {
+  const id = data.get('id') as string
+  try {
+    await db.exam.delete({
       where: {
         id: id,
       },

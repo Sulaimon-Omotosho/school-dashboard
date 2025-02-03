@@ -5,6 +5,7 @@ import {
   deleteStudent,
   deleteSubject,
   deleteTeacher,
+  deleteExam,
 } from '@/lib/actions'
 import { FormModalProps } from '@/lib/types'
 import dynamic from 'next/dynamic'
@@ -19,12 +20,12 @@ const deleteActionMap = {
   class: deleteClass,
   teacher: deleteTeacher,
   student: deleteStudent,
+  exam: deleteExam,
   parent: deleteSubject,
   announcement: deleteSubject,
   assignment: deleteSubject,
   attendance: deleteSubject,
   event: deleteSubject,
-  exam: deleteSubject,
   lesson: deleteSubject,
   result: deleteSubject,
 }
@@ -41,11 +42,13 @@ const SubjectForm = dynamic(() => import('./forms/SubjectForm'), {
 const ClassForm = dynamic(() => import('./forms/ClassForm'), {
   loading: () => <h1>Loading...</h1>,
 })
+const ExamForm = dynamic(() => import('./forms/ExamForm'), {
+  loading: () => <h1>Loading...</h1>,
+})
 const AnnouncementForm = dynamic(() => import('./forms/AnnouncementForm'))
 const AssignmentForm = dynamic(() => import('./forms/AssignmentForm'))
 const AttendanceForm = dynamic(() => import('./forms/AttendanceForm'))
 const EventForm = dynamic(() => import('./forms/EventForm'))
-const ExamForm = dynamic(() => import('./forms/ExamForm'))
 const LessonForm = dynamic(() => import('./forms/LessonForm'))
 const ParentForm = dynamic(() => import('./forms/ParentForm'))
 const ResultForm = dynamic(() => import('./forms/ResultForm'))
@@ -62,7 +65,6 @@ const forms: {
   // assignment: (setOpen, type, data) => <AssignmentForm type={type} data={data} setOpen={setOpen}  />,
   // attendance: (setOpen, type, data) => <AttendanceForm type={type} data={data} setOpen={setOpen}  />,
   // event: (setOpen, type, data) => <EventForm type={type} data={data} setOpen={setOpen}  />,
-  // exam: (setOpen, type, data) => <ExamForm type={type} data={data} setOpen={setOpen}  />,
   // lesson: (setOpen, type, data) => <LessonForm type={type} data={data} setOpen={setOpen}  />,
   // parent: (setOpen, type, data) => <ParentForm type={type} data={data} setOpen={setOpen}  />,
   // result: (setOpen, type, data) => <ResultForm type={type} data={data} setOpen={setOpen}  />,
@@ -99,6 +101,14 @@ const forms: {
       relatedData={relatedData || { teachers: [] }}
     />
   ),
+  exam: (setOpen, type, data, relatedData) => (
+    <ExamForm
+      type={type}
+      data={data}
+      setOpen={setOpen}
+      relatedData={relatedData}
+    />
+  ),
 }
 
 const FormModal = ({
@@ -119,11 +129,14 @@ const FormModal = ({
   const [open, setOpen] = useState(false)
 
   const Form = () => {
-    const [state, formAction] = useFormState(deleteActionMap[table], {
-      // const [state, formAction] = useFormState((state, data: FormData) => deleteActionMap[table](state, data), {
-      success: false,
-      error: false,
-    })
+    // const [state, formAction] = useFormState(deleteActionMap[table], {
+    const [state, formAction] = useFormState(
+      (state: any, data: FormData) => deleteActionMap[table](state, data),
+      {
+        success: false,
+        error: false,
+      }
+    )
 
     const router = useRouter()
 

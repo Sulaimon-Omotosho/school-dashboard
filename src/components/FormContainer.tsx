@@ -2,6 +2,7 @@ import { FormModalProps } from '@/lib/types'
 import React from 'react'
 import FormModal from './FormModal'
 import { db } from '@/lib/db'
+import { getUserData } from '@/lib/utils'
 
 const FormContainer = async ({ table, type, data, id }: FormModalProps) => {
   let relatedData = {}
@@ -37,6 +38,19 @@ const FormContainer = async ({ table, type, data, id }: FormModalProps) => {
           include: { _count: { select: { students: true } } },
         })
         relatedData = { grades: studentGrades, classes: studentClasses }
+        break
+      case 'exam':
+        const { role, userId } = await getUserData()
+
+        const examLessons = await db.lesson.findMany({
+          where: {
+            ...(role === 'teacher'
+              ? { teacher: { is: { clerkId: userId! } } }
+              : {}),
+          },
+          select: { id: true, name: true },
+        })
+        relatedData = { lessons: examLessons }
         break
       default:
         break

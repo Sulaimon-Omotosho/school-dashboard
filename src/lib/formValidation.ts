@@ -8,6 +8,16 @@ export const subjectSchema = z.object({
 
 export type SubjectSchema = z.infer<typeof subjectSchema>
 
+export const examSchema = z.object({
+  id: z.string().optional(),
+  title: z.string().min(4, { message: 'Subject name is required!' }),
+  startTime: z.coerce.date({ message: 'Start Time is required!' }),
+  endTime: z.coerce.date({ message: 'End Time is required!' }),
+  lessonId: z.coerce.string({ message: 'Lesson is required!' }),
+})
+
+export type ExamSchema = z.infer<typeof examSchema>
+
 export const classSchema = z.object({
   id: z.string().optional(),
   name: z.string().min(2, { message: 'Name must be at least 2 characters!' }),
